@@ -1,0 +1,45 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  TZ: Asia/Shanghai
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      job_output: ${{ steps.gen_tag.outputs.tag_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Geneerate tag name
+        id: gen_tag
+        run: echo "tag_name=v$(date +'%Y%m%d.%H%M')" >> $GITHUB_OUTPUT
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.gen_tag.outputs.tag_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+  deploy:
+    name: Release Go Binary
+    needs: release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: wangyoucao577/go-release-action@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: ${{ matrix.goos }}
+        goarch: ${{ matrix.goarch }}
+        release_tag: ${{ needs.release.outputs.job_output }}
