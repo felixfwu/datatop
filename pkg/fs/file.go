@@ -7,5 +7,5 @@ type Dir struct {
 
 type File struct {
 	root string
-	Dirs []dir
+	Dirs []Dir
 }

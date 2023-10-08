@@ -9,7 +9,7 @@ type Toper interface {
 	collect() error
 	Swap(i int, j int)
 	Len() int
-	Less(i, j int) bool
+	Less(i int, j int) bool
 	data() []interface{}
 }
 
@@ -26,5 +26,5 @@ func Top(n int, t Toper) ([]interface{}, error) {
 	if l < n {
 		return t.data()[:l], nil
 	}
-	return t.data()[:l], nil
+	return t.data()[:n], nil
 }
