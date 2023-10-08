@@ -1,11 +1,5 @@
 name: Quality
-on:
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - main
+on: [push, pull_request]
 jobs:
   test:
     name: Test with Coverage
