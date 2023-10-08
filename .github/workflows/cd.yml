@@ -12,6 +12,18 @@ permissions:
   contents: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
+
+      - name: Unit Test
+        run: go test -v ./...
   release:
     runs-on: ubuntu-latest
     outputs:
