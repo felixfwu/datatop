@@ -1,4 +1,4 @@
-package pkg
+package main
 
 import (
 	"errors"
@@ -10,10 +10,10 @@ type Toper interface {
 	Swap(i int, j int)
 	Len() int
 	Less(i int, j int) bool
-	data() []interface{}
+	data(n int) interface{}
 }
 
-func Top(n int, t Toper) ([]interface{}, error) {
+func Top(n int, t Toper) (interface{}, error) {
 	if n <= 0 {
 		return nil, errors.New("invalid number")
 	}
@@ -24,7 +24,7 @@ func Top(n int, t Toper) ([]interface{}, error) {
 	sort.Sort(sort.Reverse(t))
 	l := t.Len()
 	if l < n {
-		return t.data()[:l], nil
+		return t.data(l), nil
 	}
-	return t.data()[:n], nil
+	return t.data(n), nil
 }
