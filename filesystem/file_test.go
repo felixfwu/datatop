@@ -59,3 +59,22 @@ func TestData(t *testing.T) {
 		t.Errorf("type error %t", reflect.TypeOf(nrt))
 	}
 }
+
+func TestIsDir(t *testing.T) {
+	testCase := []struct {
+		file   string
+		expect bool
+	}{
+		{".", true},
+		{"./", true},
+		{"../filesystem", true},
+		{"./noteexists", false},
+		{"file.go", false},
+		{"./file.go", false},
+	}
+	for _, tc := range testCase {
+		if isDir(tc.file) != tc.expect {
+			t.Errorf("isDir error: %s expect %t", tc.file, tc.expect)
+		}
+	}
+}
