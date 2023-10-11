@@ -60,21 +60,20 @@ func TestData(t *testing.T) {
 	}
 }
 
-func TestIsDir(t *testing.T) {
-	testCase := []struct {
-		file   string
-		expect bool
-	}{
-		{".", true},
-		{"./", true},
-		{"../filesystem", true},
-		{"./noteexists", false},
-		{"file.go", false},
-		{"./file.go", false},
+func TestWalkCurr(t *testing.T) {
+	ds, err := walkCurr(".")
+	n := 0
+	for _, d := range ds {
+		n = n + d.Cnt
 	}
-	for _, tc := range testCase {
-		if isDir(tc.file) != tc.expect {
-			t.Errorf("isDir error: %s expect %t", tc.file, tc.expect)
-		}
+	if err != nil || len(ds) != 3 || n != 4 {
+		t.Errorf("walkCurr error: walkCurr('.')=%v,%s", ds, err)
+	}
+}
+
+func TestWalkChild(t *testing.T) {
+	c, err := walkChild("./")
+	if err != nil || c != 2 {
+		t.Errorf("walkChild error: walkChild=%d%s", c, err)
 	}
 }

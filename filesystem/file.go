@@ -1,7 +1,9 @@
 package filesystem
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type Dir struct {
@@ -53,17 +55,43 @@ func (f *File) collect() error {
 }
 */
 
-func isDir(f string) bool {
-	s, err := os.Stat(f)
+func walkCurr(f string) ([]Dir, error) {
+	r, err := os.Open(f)
 	if err != nil {
-		return false
+		return nil, err
 	}
-	return s.IsDir()
+	files, err := r.Readdir(-1)
+	defer r.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	fd := Dir{Name: f, Cnt: 0}
+	dirs := []Dir{}
+	for _, file := range files {
+		fp := fmt.Sprintf("%s/%s", f, file.Name())
+		if file.IsDir() {
+			dirs = append(dirs, Dir{Name: fp, Cnt: 0})
+		} else {
+			dirs = append(dirs, Dir{Name: fp, Cnt: 1})
+		}
+		fd.Cnt++
+	}
+	return append(dirs, fd), nil
 }
 
-/*
-func walkCurr(f string) error {
+func walkChild(f string) (int, error) {
+	cnt := -1
+	err := filepath.Walk(f, func(fname string, file os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		cnt++
+		return nil
+	})
+	if err != nil {
+		return 0, err
+	}
 
-	return nil
+	return cnt, nil
 }
-*/
