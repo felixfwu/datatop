@@ -66,7 +66,7 @@ func TestWalkCurr(t *testing.T) {
 	for _, d := range ds {
 		n = n + d.Cnt
 	}
-	if err != nil || len(ds) != 3 || n != 4 {
+	if err != nil || len(ds) != 2 || n != 2 {
 		t.Errorf("walkCurr error: walkCurr('.')=%v,%s", ds, err)
 	}
 }

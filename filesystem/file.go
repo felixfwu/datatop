@@ -35,25 +35,20 @@ func (f File) data(n int) interface{} {
 	return interface{}(f.Dirs[:n])
 }
 
-/*
 func (f *File) collect() error {
-	var sb strings.Builder
-	r, err := os.Open(f.Root)
+	ds, err := walkCurr(f.Root)
 	if err != nil {
 		return err
 	}
-	files, err := r.Readdir(-1)
-	defer r.Close()
-	if err != nil {
-		sb.WriteString(err.Error())
-		sb.WriteString("\n")
+	for _, d := range ds {
+		c, err := walkChild(d.Name)
+		if err != nil {
+			return err
+		}
+		d.Cnt = c
 	}
-
-	for _, file := range files {
-		fmt.Println(file.Name())
-	}
+	return nil
 }
-*/
 
 func walkCurr(f string) ([]Dir, error) {
 	r, err := os.Open(f)
@@ -66,7 +61,6 @@ func walkCurr(f string) ([]Dir, error) {
 		return nil, err
 	}
 
-	fd := Dir{Name: f, Cnt: 0}
 	dirs := []Dir{}
 	for _, file := range files {
 		fp := fmt.Sprintf("%s/%s", f, file.Name())
@@ -75,9 +69,9 @@ func walkCurr(f string) ([]Dir, error) {
 		} else {
 			dirs = append(dirs, Dir{Name: fp, Cnt: 1})
 		}
-		fd.Cnt++
+
 	}
-	return append(dirs, fd), nil
+	return dirs, nil
 }
 
 func walkChild(f string) (int, error) {
