@@ -1,4 +1,4 @@
-package main
+package datatop
 
 import (
 	"errors"
@@ -10,14 +10,14 @@ type mockToper struct {
 	mockData []int
 }
 
-func (m *mockToper) collect() error {
+func (m mockToper) Collect() error {
 	if m.isErr {
 		return errors.New("mock error")
 	}
 	return nil
 }
 
-func (m *mockToper) Swap(i int, j int) {
+func (m mockToper) Swap(i int, j int) {
 
 }
 
@@ -29,7 +29,7 @@ func (m mockToper) Less(i int, j int) bool {
 	return true
 }
 
-func (m mockToper) data(n int) interface{} {
+func (m mockToper) Data(n int) interface{} {
 	return m.mockData[:n]
 }
 

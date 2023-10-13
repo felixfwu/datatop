@@ -1,4 +1,4 @@
-package main
+package datatop
 
 import (
 	"errors"
@@ -6,11 +6,11 @@ import (
 )
 
 type Toper interface {
-	collect() error
+	Collect() error
 	Swap(i int, j int)
 	Len() int
 	Less(i int, j int) bool
-	data(n int) interface{}
+	Data(n int) interface{}
 }
 
 func Top(n int, t Toper) (interface{}, error) {
@@ -18,13 +18,13 @@ func Top(n int, t Toper) (interface{}, error) {
 		return nil, errors.New("invalid number")
 	}
 
-	if err := t.collect(); err != nil {
+	if err := t.Collect(); err != nil {
 		return nil, err
 	}
 	sort.Sort(sort.Reverse(t))
 	l := t.Len()
 	if l < n {
-		return t.data(l), nil
+		return t.Data(l), nil
 	}
-	return t.data(n), nil
+	return t.Data(n), nil
 }

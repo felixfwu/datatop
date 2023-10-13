@@ -54,9 +54,20 @@ func TestLess(t *testing.T) {
 func TestData(t *testing.T) {
 	testCase := File{Root: "/usr", Dirs: []Dir{{Name: "/tmp", Cnt: 10}}}
 
-	r := testCase.data(1)
+	r := testCase.Data(1)
 	if nrt, ok := r.([]Dir); !ok {
 		t.Errorf("type error %t", reflect.TypeOf(nrt))
+	}
+}
+
+func TestCollect(t *testing.T) {
+	f := File{Root: "."}
+	err := f.Collect()
+	if err != nil {
+		t.Errorf("Collect error: %s", err)
+	}
+	if len(f.Dirs) != 2 {
+		t.Errorf("Collect len error: expect=2 acture=%v", f.Dirs)
 	}
 }
 
