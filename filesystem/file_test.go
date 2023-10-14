@@ -10,10 +10,10 @@ func TestSwap(t *testing.T) {
 		iDir []Dir
 		eDir []Dir
 	}{
-		iDir: []Dir{{Name: "/root", Cnt: 10}, {Name: "/usr", Cnt: 20}},
-		eDir: []Dir{{Name: "/usr", Cnt: 20}, {Name: "/root", Cnt: 10}},
+		iDir: []Dir{{Path: "/root", FileCount: 10}, {Path: "/usr", FileCount: 20}},
+		eDir: []Dir{{Path: "/usr", FileCount: 20}, {Path: "/root", FileCount: 10}},
 	}
-	f := File{Dirs: testCase.iDir}
+	f := FileSystem{Dirs: testCase.iDir}
 	i, j := 0, 1
 	f.Swap(i, j)
 	if f.Dirs[i] != testCase.eDir[i] || f.Dirs[j] != testCase.eDir[j] {
@@ -22,9 +22,9 @@ func TestSwap(t *testing.T) {
 }
 
 func TestLen(t *testing.T) {
-	testCase := []File{
+	testCase := []FileSystem{
 		{Root: "/home"},
-		{Root: "/usr", Dirs: []Dir{{Name: "/tmp", Cnt: 10}}},
+		{Root: "/usr", Dirs: []Dir{{Path: "/tmp", FileCount: 10}}},
 	}
 	for _, tc := range testCase {
 		if tc.Len() != len(tc.Dirs) {
@@ -34,7 +34,7 @@ func TestLen(t *testing.T) {
 }
 
 func TestLess(t *testing.T) {
-	mockFile := File{Root: "/usr", Dirs: []Dir{{Name: "/tmp", Cnt: 10}, {Name: "root", Cnt: 20}}}
+	mockFile := FileSystem{Root: "/usr", Dirs: []Dir{{Path: "/tmp", FileCount: 10}, {Path: "root", FileCount: 20}}}
 	testCase := []struct {
 		ii      int
 		ij      int
@@ -52,7 +52,7 @@ func TestLess(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	testCase := File{Root: "/usr", Dirs: []Dir{{Name: "/tmp", Cnt: 10}}}
+	testCase := FileSystem{Root: "/usr", Dirs: []Dir{{Path: "/tmp", FileCount: 10}}}
 
 	r := testCase.Data(1)
 	if nrt, ok := r.([]Dir); !ok {
@@ -61,13 +61,13 @@ func TestData(t *testing.T) {
 }
 
 func TestCollect(t *testing.T) {
-	f := File{Root: "."}
+	f := FileSystem{Root: "."}
 	err := f.Collect()
 	if err != nil {
 		t.Errorf("Collect error: %s", err)
 	}
-	if len(f.Dirs) != 2 {
-		t.Errorf("Collect len error: expect=2 acture=%v", f.Dirs)
+	if len(f.Dirs) != 1 {
+		t.Errorf("Collect len error: expect=1 acture=%v", f.Dirs)
 	}
 }
 
@@ -75,9 +75,9 @@ func TestWalkCurr(t *testing.T) {
 	ds, err := walkCurr(".")
 	n := 0
 	for _, d := range ds {
-		n = n + d.Cnt
+		n = n + d.FileCount
 	}
-	if err != nil || len(ds) != 2 || n != 2 {
+	if err != nil || len(ds) != 1 || n != 2 {
 		t.Errorf("walkCurr error: walkCurr('.')=%v,%s", ds, err)
 	}
 }

@@ -3,93 +3,95 @@ package filesystem
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
 
 type Dir struct {
-	Name string
-	Cnt  int
+	Path      string
+	FileCount int
 }
 
-type File struct {
+type FileSystem struct {
 	Root string
 	Dirs []Dir
 }
 
-func (f File) Swap(i int, j int) {
-	f.Dirs[i], f.Dirs[j] = f.Dirs[j], f.Dirs[i]
+func (fs FileSystem) Swap(i int, j int) {
+	fs.Dirs[i], fs.Dirs[j] = fs.Dirs[j], fs.Dirs[i]
 }
 
-func (f File) Len() int {
-	return len(f.Dirs)
+func (fs FileSystem) Len() int {
+	return len(fs.Dirs)
 }
 
-func (f File) Less(i int, j int) bool {
-	if f.Dirs[i].Cnt < f.Dirs[j].Cnt {
+func (fs FileSystem) Less(i int, j int) bool {
+	if fs.Dirs[i].FileCount < fs.Dirs[j].FileCount {
 		return true
 	}
 	return false
 }
 
-func (f File) Data(n int) interface{} {
-	return interface{}(f.Dirs[:n])
+func (fs FileSystem) Data(n int) interface{} {
+	return interface{}(fs.Dirs[:n])
 }
 
-func (f *File) Collect() error {
-	ds, err := walkCurr(f.Root)
+func (fs *FileSystem) Collect() error {
+	ds, err := walkCurr(fs.Root)
 	if err != nil {
-		return errors.Join(fmt.Errorf("Collect error: %s", err), err)
+		return errors.Join(errors.New("filesystem collect error"), err)
 	}
-	for _, d := range ds {
-		if d.Cnt != 0 {
-			c, err := walkChild(d.Name)
+	for i, d := range ds {
+		if d.Path != fs.Root {
+			c, err := walkChild(filepath.Join(fs.Root, d.Path))
 			if err != nil {
-				return errors.Join(fmt.Errorf("Collect error: %s", err), err)
+				return errors.Join(errors.New("filesystem collect error"), err)
 			}
-			d.Cnt = c
+			ds[i].FileCount = c
 		}
 	}
-	f.Dirs = ds
+	fs.Dirs = ds
 	return nil
 }
 
-func walkCurr(f string) ([]Dir, error) {
-	r, err := os.Open(f)
+func walkCurr(path string) ([]Dir, error) {
+	osf, err := os.Open(path)
 	if err != nil {
-		return nil, fmt.Errorf("walkCurr error: %s", err)
+		return nil, errors.Join(fmt.Errorf("walkCurr open path=%s error", path), err)
 	}
-	files, err := r.Readdir(-1)
-	defer r.Close()
+	fs, err := osf.Readdir(-1)
+	defer osf.Close()
 	if err != nil {
-		return nil, fmt.Errorf("walkCurr error: %s", err)
+		return nil, errors.Join(errors.New("walkCurr read dir error"), err)
 	}
 
-	dirs := []Dir{}
-	for _, file := range files {
-		fp := filepath.Clean(file.Name())
-		if file.IsDir() {
-			dirs = append(dirs, Dir{Name: fp, Cnt: 0})
-		} else {
-			dirs = append(dirs, Dir{Name: fp, Cnt: 1})
+	ds := []Dir{}
+	d := Dir{Path: path, FileCount: 0}
+	for _, f := range fs {
+		if f.IsDir() {
+			ds = append(ds, Dir{Path: f.Name(), FileCount: 0})
 		}
-
+		d.FileCount++
 	}
-	return dirs, nil
+	return append(ds, d), nil
 }
 
-func walkChild(f string) (int, error) {
+func walkChild(path string) (int, error) {
 	cnt := -1
-	err := filepath.Walk(f, func(fname string, file os.FileInfo, err error) error {
-		if err != nil {
-			return fmt.Errorf("walkChild error: %s", err)
-		}
-		cnt++
-		return nil
+	err := filepath.WalkDir(path, func(path string, entry fs.DirEntry, err error) error {
+		return walkFunc(&cnt, path, entry, err)
 	})
 	if err != nil {
-		return 0, fmt.Errorf("walkChild error: %s", err)
+		return 0, err
 	}
-
 	return cnt, nil
+}
+
+func walkFunc(cnt *int, path string, entry fs.DirEntry, err error) error {
+	if err != nil {
+		return err
+	}
+	*cnt++
+	return nil
 }

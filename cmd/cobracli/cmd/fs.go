@@ -1,4 +1,4 @@
-package cmd
+package cobracli
 
 import (
 	"errors"
@@ -22,20 +22,20 @@ var fsCmd = &cobra.Command{
 	Long:  `Find the directory with the most files in the file system.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fs := filesystem.File{}
+		fs := filesystem.FileSystem{}
 		if len(args) == 0 {
-			fs.Root = "./"
+			fs.Root = "."
 		} else {
 			fs.Root = args[0]
 		}
-		d, err := datatop.Top(n, &fs)
+		ds, err := datatop.Top(n, &fs)
 		if err != nil {
-			return errors.Join(fmt.Errorf("fsCmd error: %s", err), err)
+			return errors.Join(errors.New("fsCmd error"), err)
 		}
 
-		fds := (d).([]filesystem.Dir)
+		fds := (ds).([]filesystem.Dir)
 		for _, f := range fds {
-			fmt.Printf("%s\t%d\n", f.Name, f.Cnt)
+			fmt.Printf("%d\t\t%s\n", f.FileCount, f.Path)
 		}
 		return nil
 	},
