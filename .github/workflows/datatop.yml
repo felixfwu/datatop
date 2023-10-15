@@ -28,7 +28,6 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.54
-          args: --verbose
   
   test:
     needs: lint
@@ -50,8 +49,7 @@ jobs:
         run: go test -race --coverprofile=coverage.coverprofile --covermode=atomic ./...
 
       - name: Upload coverage to Codecov
+        if: success() && matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        with:
-          flags: ${{ matrix.os }}
