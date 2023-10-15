@@ -27,10 +27,7 @@ func (fs FileSystem) Len() int {
 }
 
 func (fs FileSystem) Less(i int, j int) bool {
-	if fs.Dirs[i].FileCount < fs.Dirs[j].FileCount {
-		return true
-	}
-	return false
+	return fs.Dirs[i].FileCount < fs.Dirs[j].FileCount
 }
 
 func (fs FileSystem) Data(n int) interface{} {
