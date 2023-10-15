@@ -1,6 +1,6 @@
 # datatop
 
 ![GitHub](https://img.shields.io/github/license/felixfwu/datatop)
-[![Coverage Status](https://coveralls.io/repos/github/felixfwu/datatop/badge.svg?branch=main)](https://coveralls.io/github/felixfwu/datatop?branch=main)
+[![codecov](https://codecov.io/gh/felixfwu/datatop/graph/badge.svg?token=VAC4EZSHEJ)](https://codecov.io/gh/felixfwu/datatop)
 
 A tool for finding top data.
