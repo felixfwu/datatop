@@ -1,4 +1,4 @@
-name: Test
+name: Run Tests
 
 on:
   push:
@@ -18,12 +18,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Setup go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.LATEST_GO_VERSION }}
-      - name: Checkout repository
-        uses: actions/checkout@v4
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -38,13 +38,13 @@ jobs:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.LATEST_GO_VERSION }}
-
-      - name: Checkout Code
-        uses: actions/checkout@v4
 
       - name: Run Tests
         run: go test -race --coverprofile=coverage.coverprofile --covermode=atomic ./...
