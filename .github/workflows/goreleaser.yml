@@ -26,6 +26,8 @@ jobs:
         with:
           go-version: ${{ env.LATEST_GO_VERSION }}
       -
+        run: echo ${{ github.ref }} > cmd/cobracli/cmd/VERSION
+      -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
