@@ -7,9 +7,10 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "datatop",
-	Short: "An open source tool for finding top data.",
-	Long:  `An open source tool for finding top data. http://github.com/felixfwu/datatop`,
+	Use:          "datatop",
+	SilenceUsage: true,
+	Short:        "An open source tool for finding top data.",
+	Long:         `An open source tool for finding top data. http://github.com/felixfwu/datatop`,
 }
 
 func Execute() {

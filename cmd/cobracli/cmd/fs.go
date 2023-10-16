@@ -17,7 +17,7 @@ func init() {
 }
 
 var fsCmd = &cobra.Command{
-	Use:   "fs",
+	Use:   "fs [flags] [path]",
 	Short: "Find the directory with the most files.",
 	Long:  `Find the directory with the most files in the file system.`,
 	Args:  cobra.MaximumNArgs(1),
