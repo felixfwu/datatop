@@ -22,19 +22,19 @@ var fsCmd = &cobra.Command{
 	Long:  `Find the directory with the most files in the file system.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fs := filesystem.FileToper{}
+		ft := filesystem.FileToper{}
 		if len(args) == 0 {
-			fs.Root = "."
+			ft.Root = "."
 		} else {
-			fs.Root = args[0]
+			ft.Root = args[0]
 		}
-		ds, err := datatop.Top(n, &fs)
+		ds, err := datatop.Top(n, &ft)
 		if err != nil {
 			return errors.Join(errors.New("fsCmd error"), err)
 		}
 
-		fds := (ds).([]filesystem.File)
-		for _, f := range fds {
+		fs := (ds).([]filesystem.File)
+		for _, f := range fs {
 			fmt.Printf("%d\t\t%s\n", f.FileCount, f.Path)
 		}
 		return nil
