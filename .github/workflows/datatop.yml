@@ -30,9 +30,20 @@ jobs:
           version: v1.54
   
   test:
+    strategy:
+      matrix:
+        container:
+        - 'centos:6'
+        - 'centos:7'
+        - 'mcr.microsoft.com/windows/nanoserver:ltsc2022'
+        - 'oraclelinux:6'
+        - 'oraclelinux:7'
+        - 'crorvick/redhat:6.2'
+        - 'yjjy0921/redhat7.2:latest'
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
     needs: lint
     name: test
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -46,6 +57,7 @@ jobs:
         run: go test -race --coverprofile=coverage.coverprofile --covermode=atomic ./...
 
       - name: Upload coverage to Codecov
+        if: success() && matrix.os == 'centos:7'
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
