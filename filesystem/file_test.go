@@ -61,6 +61,26 @@ func TestData(t *testing.T) {
 }
 
 func TestCollect(t *testing.T) {
+	testCase := []struct {
+		path   string // input path
+		eDirs  []Dir  //expect return []Dir
+		eIsErr bool   // should return error or not
+	}{
+		{path: "", eDirs: []Dir{}, eIsErr: true},
+		{path: "./notexists", eDirs: []Dir{}, eIsErr: true},
+		{path: ".", eDirs: append([]Dir{{Path: ".", FileCount: 2}}, Dir{}), eIsErr: false},
+		{path: "./", eDirs: append([]Dir{{Path: "./", FileCount: 2}}, Dir{}), eIsErr: false},
+		{path: "./.", eDirs: append([]Dir{{Path: "./.", FileCount: 2}}, Dir{}), eIsErr: false},
+		{path: "../filesystem/", eDirs: append([]Dir{{Path: "../filesystem/", FileCount: 2}}, Dir{}), eIsErr: false},
+		{path: "../cmd", eDirs: append([]Dir{{Path: "../cmd", FileCount: 4}}, Dir{}), eIsErr: false},
+	}
+	for _, tc := range testCase {
+		f := FileSystem{Root: tc.path}
+		err := f.Collect()
+		if reflect.DeepEqual(f.Dirs, tc.eDirs) || (err != nil) != tc.eIsErr {
+			t.Errorf("testcase=%v failed: %v=Collect() f=%v", tc, err, f)
+		}
+	}
 	f := FileSystem{Root: "."}
 	err := f.Collect()
 	if err != nil {
@@ -71,20 +91,51 @@ func TestCollect(t *testing.T) {
 	}
 }
 
+// use the code directory to test.
+//
+// ps. actually i don't know how to test is better when there is os.open, filepath.walk etc
 func TestWalkCurr(t *testing.T) {
-	ds, err := walkCurr(".")
-	n := 0
-	for _, d := range ds {
-		n = n + d.FileCount
+	testCase := []struct {
+		path   string // input path
+		eDirs  []Dir  //expect return []Dir
+		eIsErr bool   // should return error or not
+	}{
+		{path: "", eDirs: []Dir{}, eIsErr: true},
+		{path: "./notexists", eDirs: []Dir{}, eIsErr: true},
+		{path: ".", eDirs: append([]Dir{{Path: ".", FileCount: 2}}, Dir{}), eIsErr: false},
+		{path: "./", eDirs: append([]Dir{{Path: "./", FileCount: 2}}, Dir{}), eIsErr: false},
+		{path: "./.", eDirs: append([]Dir{{Path: "./.", FileCount: 2}}, Dir{}), eIsErr: false},
+		{path: "../filesystem/", eDirs: append([]Dir{{Path: "../filesystem/", FileCount: 2}}, Dir{}), eIsErr: false},
+		{path: "../cmd", eDirs: append([]Dir{{Path: "../cmd", FileCount: 4}}, Dir{}), eIsErr: false},
 	}
-	if err != nil || len(ds) != 1 || n != 2 {
-		t.Errorf("walkCurr error: walkCurr('.')=%v,%s", ds, err)
+	for _, tc := range testCase {
+		ds, err := walkCurr(tc.path)
+		if reflect.DeepEqual(ds, tc.eDirs) || (err != nil) != tc.eIsErr {
+			t.Errorf("testcase=%v failed: %v, %v=walkCurr(%s)", tc, ds, err, tc.path)
+		}
 	}
 }
 
+// use the code directory to test.
+//
+// ps. actually i don't know how to test is better when there is os.open, filepath.walk etc
 func TestWalkChild(t *testing.T) {
-	c, err := walkChild("./")
-	if err != nil || c != 2 {
-		t.Errorf("walkChild error: walkChild=%d%s", c, err)
+	testCase := []struct {
+		path   string // input path
+		eCnt   int    //expect count
+		eIsErr bool   // should return error or not
+	}{
+		{path: "", eCnt: 0, eIsErr: true},
+		{path: "./notexists", eCnt: 0, eIsErr: true},
+		{path: ".", eCnt: 2, eIsErr: false},
+		{path: "./", eCnt: 2, eIsErr: false},
+		{path: "./.", eCnt: 2, eIsErr: false},
+		{path: "../filesystem/", eCnt: 2, eIsErr: false},
+	}
+	for _, tc := range testCase {
+		cnt, err := walkChild(tc.path)
+		if cnt != tc.eCnt || (err != nil) != tc.eIsErr {
+			t.Errorf("testcase=%v failed: %d, %v=walkChild(%s)", tc, cnt, err, tc.path)
+		}
 	}
 }
