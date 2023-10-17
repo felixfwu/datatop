@@ -7,13 +7,13 @@ import (
 
 func TestSwap(t *testing.T) {
 	testCase := struct {
-		iDir []Dir
-		eDir []Dir
+		iDir []File
+		eDir []File
 	}{
-		iDir: []Dir{{Path: "/root", FileCount: 10}, {Path: "/usr", FileCount: 20}},
-		eDir: []Dir{{Path: "/usr", FileCount: 20}, {Path: "/root", FileCount: 10}},
+		iDir: []File{{Path: "/root", FileCount: 10}, {Path: "/usr", FileCount: 20}},
+		eDir: []File{{Path: "/usr", FileCount: 20}, {Path: "/root", FileCount: 10}},
 	}
-	f := FileSystem{Dirs: testCase.iDir}
+	f := FileToper{Dirs: testCase.iDir}
 	i, j := 0, 1
 	f.Swap(i, j)
 	if f.Dirs[i] != testCase.eDir[i] || f.Dirs[j] != testCase.eDir[j] {
@@ -22,9 +22,9 @@ func TestSwap(t *testing.T) {
 }
 
 func TestLen(t *testing.T) {
-	testCase := []FileSystem{
+	testCase := []FileToper{
 		{Root: "/home"},
-		{Root: "/usr", Dirs: []Dir{{Path: "/tmp", FileCount: 10}}},
+		{Root: "/usr", Dirs: []File{{Path: "/tmp", FileCount: 10}}},
 	}
 	for _, tc := range testCase {
 		if tc.Len() != len(tc.Dirs) {
@@ -34,7 +34,7 @@ func TestLen(t *testing.T) {
 }
 
 func TestLess(t *testing.T) {
-	mockFile := FileSystem{Root: "/usr", Dirs: []Dir{{Path: "/tmp", FileCount: 10}, {Path: "root", FileCount: 20}}}
+	mockFile := FileToper{Root: "/usr", Dirs: []File{{Path: "/tmp", FileCount: 10}, {Path: "root", FileCount: 20}}}
 	testCase := []struct {
 		ii      int
 		ij      int
@@ -52,10 +52,10 @@ func TestLess(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	testCase := FileSystem{Root: "/usr", Dirs: []Dir{{Path: "/tmp", FileCount: 10}}}
+	testCase := FileToper{Root: "/usr", Dirs: []File{{Path: "/tmp", FileCount: 10}}}
 
 	r := testCase.Data(1)
-	if nrt, ok := r.([]Dir); !ok {
+	if nrt, ok := r.([]File); !ok {
 		t.Errorf("type error %t", reflect.TypeOf(nrt))
 	}
 }
@@ -63,25 +63,25 @@ func TestData(t *testing.T) {
 func TestCollect(t *testing.T) {
 	testCase := []struct {
 		path   string // input path
-		eDirs  []Dir  //expect return []Dir
+		eDirs  []File //expect return []Dir
 		eIsErr bool   // should return error or not
 	}{
-		{path: "", eDirs: []Dir{}, eIsErr: true},
-		{path: "./notexists", eDirs: []Dir{}, eIsErr: true},
-		{path: ".", eDirs: append([]Dir{{Path: ".", FileCount: 2}}, Dir{}), eIsErr: false},
-		{path: "./", eDirs: append([]Dir{{Path: "./", FileCount: 2}}, Dir{}), eIsErr: false},
-		{path: "./.", eDirs: append([]Dir{{Path: "./.", FileCount: 2}}, Dir{}), eIsErr: false},
-		{path: "../filesystem/", eDirs: append([]Dir{{Path: "../filesystem/", FileCount: 2}}, Dir{}), eIsErr: false},
-		{path: "../cmd", eDirs: append([]Dir{{Path: "../cmd", FileCount: 4}}, Dir{}), eIsErr: false},
+		{path: "", eDirs: []File{}, eIsErr: true},
+		{path: "./notexists", eDirs: []File{}, eIsErr: true},
+		{path: ".", eDirs: append([]File{{Path: ".", FileCount: 2}}, File{}), eIsErr: false},
+		{path: "./", eDirs: append([]File{{Path: "./", FileCount: 2}}, File{}), eIsErr: false},
+		{path: "./.", eDirs: append([]File{{Path: "./.", FileCount: 2}}, File{}), eIsErr: false},
+		{path: "../filesystem/", eDirs: append([]File{{Path: "../filesystem/", FileCount: 2}}, File{}), eIsErr: false},
+		{path: "../cmd", eDirs: append([]File{{Path: "../cmd", FileCount: 4}}, File{}), eIsErr: false},
 	}
 	for _, tc := range testCase {
-		f := FileSystem{Root: tc.path}
+		f := FileToper{Root: tc.path}
 		err := f.Collect()
 		if reflect.DeepEqual(f.Dirs, tc.eDirs) || (err != nil) != tc.eIsErr {
 			t.Errorf("testcase=%v failed: %v=Collect() f=%v", tc, err, f)
 		}
 	}
-	f := FileSystem{Root: "."}
+	f := FileToper{Root: "."}
 	err := f.Collect()
 	if err != nil {
 		t.Errorf("Collect error: %s", err)
@@ -97,16 +97,16 @@ func TestCollect(t *testing.T) {
 func TestWalkCurr(t *testing.T) {
 	testCase := []struct {
 		path   string // input path
-		eDirs  []Dir  //expect return []Dir
+		eDirs  []File //expect return []Dir
 		eIsErr bool   // should return error or not
 	}{
-		{path: "", eDirs: []Dir{}, eIsErr: true},
-		{path: "./notexists", eDirs: []Dir{}, eIsErr: true},
-		{path: ".", eDirs: append([]Dir{{Path: ".", FileCount: 2}}, Dir{}), eIsErr: false},
-		{path: "./", eDirs: append([]Dir{{Path: "./", FileCount: 2}}, Dir{}), eIsErr: false},
-		{path: "./.", eDirs: append([]Dir{{Path: "./.", FileCount: 2}}, Dir{}), eIsErr: false},
-		{path: "../filesystem/", eDirs: append([]Dir{{Path: "../filesystem/", FileCount: 2}}, Dir{}), eIsErr: false},
-		{path: "../cmd", eDirs: append([]Dir{{Path: "../cmd", FileCount: 4}}, Dir{}), eIsErr: false},
+		{path: "", eDirs: []File{}, eIsErr: true},
+		{path: "./notexists", eDirs: []File{}, eIsErr: true},
+		{path: ".", eDirs: append([]File{{Path: ".", FileCount: 2}}, File{}), eIsErr: false},
+		{path: "./", eDirs: append([]File{{Path: "./", FileCount: 2}}, File{}), eIsErr: false},
+		{path: "./.", eDirs: append([]File{{Path: "./.", FileCount: 2}}, File{}), eIsErr: false},
+		{path: "../filesystem/", eDirs: append([]File{{Path: "../filesystem/", FileCount: 2}}, File{}), eIsErr: false},
+		{path: "../cmd", eDirs: append([]File{{Path: "../cmd", FileCount: 4}}, File{}), eIsErr: false},
 	}
 	for _, tc := range testCase {
 		ds, err := walkCurr(tc.path)

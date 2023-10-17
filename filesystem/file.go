@@ -8,33 +8,33 @@ import (
 	"path/filepath"
 )
 
-type Dir struct {
+type File struct {
 	Path      string
 	FileCount int
 }
 
-type FileSystem struct {
+type FileToper struct {
 	Root string
-	Dirs []Dir
+	Dirs []File
 }
 
-func (fs FileSystem) Swap(i int, j int) {
+func (fs FileToper) Swap(i int, j int) {
 	fs.Dirs[i], fs.Dirs[j] = fs.Dirs[j], fs.Dirs[i]
 }
 
-func (fs FileSystem) Len() int {
+func (fs FileToper) Len() int {
 	return len(fs.Dirs)
 }
 
-func (fs FileSystem) Less(i int, j int) bool {
+func (fs FileToper) Less(i int, j int) bool {
 	return fs.Dirs[i].FileCount < fs.Dirs[j].FileCount
 }
 
-func (fs FileSystem) Data(n int) interface{} {
+func (fs FileToper) Data(n int) interface{} {
 	return interface{}(fs.Dirs[:n])
 }
 
-func (fs *FileSystem) Collect() error {
+func (fs *FileToper) Collect() error {
 	ds, err := walkCurr(fs.Root)
 	if err != nil {
 		return errors.Join(errors.New("filesystem collect error"), err)
@@ -52,7 +52,7 @@ func (fs *FileSystem) Collect() error {
 	return nil
 }
 
-func walkCurr(path string) ([]Dir, error) {
+func walkCurr(path string) ([]File, error) {
 	osf, err := os.Open(path)
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("walkCurr open path=%s error", path), err)
@@ -63,11 +63,11 @@ func walkCurr(path string) ([]Dir, error) {
 		return nil, errors.Join(errors.New("walkCurr read dir error"), err)
 	}
 
-	ds := []Dir{}
-	d := Dir{Path: path, FileCount: 0}
+	ds := []File{}
+	d := File{Path: path, FileCount: 0}
 	for _, f := range fs {
 		if f.IsDir() {
-			ds = append(ds, Dir{Path: f.Name(), FileCount: 0})
+			ds = append(ds, File{Path: f.Name(), FileCount: 0})
 		}
 		d.FileCount++
 	}

@@ -22,7 +22,7 @@ var fsCmd = &cobra.Command{
 	Long:  `Find the directory with the most files in the file system.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fs := filesystem.FileSystem{}
+		fs := filesystem.FileToper{}
 		if len(args) == 0 {
 			fs.Root = "."
 		} else {
@@ -33,7 +33,7 @@ var fsCmd = &cobra.Command{
 			return errors.Join(errors.New("fsCmd error"), err)
 		}
 
-		fds := (ds).([]filesystem.Dir)
+		fds := (ds).([]filesystem.File)
 		for _, f := range fds {
 			fmt.Printf("%d\t\t%s\n", f.FileCount, f.Path)
 		}
