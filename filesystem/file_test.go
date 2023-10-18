@@ -52,11 +52,20 @@ func TestLess(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	testCase := FileToper{Root: "/usr", Dirs: []File{{Path: "/tmp", FileCount: 10}}}
+	testCase := []struct {
+		n      int
+		expect int
+	}{
+		{n: 10, expect: 10},
+		{n: 1, expect: 1},
+	}
+	mockToper := FileToper{Dirs: make([]File, 10)}
 
-	r := testCase.Data(1)
-	if nrt, ok := r.([]File); !ok {
-		t.Errorf("type error %t", reflect.TypeOf(nrt))
+	for _, tc := range testCase {
+		l := len(mockToper.Data(tc.n).([]File))
+		if l != tc.expect {
+			t.Errorf("testcase error: %v", tc)
+		}
 	}
 }
 
