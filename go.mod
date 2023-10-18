@@ -3,7 +3,7 @@ module github.com/felixfwu/datatop
 go 1.21.2
 
 require (
-	github.com/sijms/go-ora/v2 v2.7.19
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/spf13/cobra v1.7.0
 )
 
