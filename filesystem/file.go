@@ -58,10 +58,10 @@ func walkCurr(path string) ([]File, error) {
 		return nil, errors.Join(fmt.Errorf("walkCurr open path=%s error", path), err)
 	}
 	fs, err := osf.ReadDir(-1)
-	defer osf.Close()
 	if err != nil {
 		return nil, errors.Join(errors.New("walkCurr read dir error"), err)
 	}
+	defer osf.Close()
 
 	ds := []File{}
 	d := File{Path: path, FileCount: 0}
